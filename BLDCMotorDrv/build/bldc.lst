@@ -1,0 +1,1526 @@
+ARM GAS  C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.eabi_attribute 27, 1
+   3              		.eabi_attribute 28, 1
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"bldc.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.PID_Init,"ax",%progbits
+  18              		.align	1
+  19              		.global	PID_Init
+  20              		.syntax unified
+  21              		.thumb
+  22              		.thumb_func
+  23              		.fpu fpv4-sp-d16
+  25              	PID_Init:
+  26              	.LFB130:
+  27              		.file 1 "Src/bldc.c"
+   1:Src/bldc.c    **** #include "bldc.h"
+   2:Src/bldc.c    **** 
+   3:Src/bldc.c    **** volatile uint16_t ADC_DualConvertValTab[5];
+   4:Src/bldc.c    **** 
+   5:Src/bldc.c    **** HALL hallTree;
+   6:Src/bldc.c    **** STATE stateContr;
+   7:Src/bldc.c    **** PIDREG_T piSpd = PIDREG_T_DEFAULTS;
+   8:Src/bldc.c    **** PIDREG_T piICurr = PIDREG_T_DEFAULTS;
+   9:Src/bldc.c    **** ADCSamp ADCSampPare = ADCSAMP_DEFAULTS;
+  10:Src/bldc.c    **** 
+  11:Src/bldc.c    **** void PID_Init(void)
+  12:Src/bldc.c    **** {
+  28              		.loc 1 12 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              		@ link register save eliminated.
+  33 0000 30B4     		push	{r4, r5}
+  34              	.LCFI0:
+  35              		.cfi_def_cfa_offset 8
+  36              		.cfi_offset 4, -8
+  37              		.cfi_offset 5, -4
+  13:Src/bldc.c    ****     piSpd.kp = SPEED_KP;
+  38              		.loc 1 13 0
+  39 0002 0C4B     		ldr	r3, .L3
+  40 0004 0C4A     		ldr	r2, .L3+4
+  41 0006 DA60     		str	r2, [r3, #12]	@ float
+  14:Src/bldc.c    ****     piSpd.ki = SPEED_KI;
+  42              		.loc 1 14 0
+  43 0008 0C4A     		ldr	r2, .L3+8
+  44 000a 1A63     		str	r2, [r3, #48]	@ float
+ARM GAS  C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s 			page 2
+
+
+  15:Src/bldc.c    ****     piSpd.kc = SPEED_KC;
+  45              		.loc 1 15 0
+  46 000c 5A63     		str	r2, [r3, #52]	@ float
+  16:Src/bldc.c    ****     piSpd.outMax = 10000;
+  47              		.loc 1 16 0
+  48 000e 0C48     		ldr	r0, .L3+12
+  49 0010 1862     		str	r0, [r3, #32]	@ float
+  17:Src/bldc.c    ****     piSpd.outMin = 1000;
+  50              		.loc 1 17 0
+  51 0012 0C4C     		ldr	r4, .L3+16
+  52 0014 5C62     		str	r4, [r3, #36]	@ float
+  18:Src/bldc.c    ****     piSpd.ref = 0;
+  53              		.loc 1 18 0
+  54 0016 0021     		movs	r1, #0
+  55 0018 1960     		str	r1, [r3]	@ float
+  19:Src/bldc.c    ****     piICurr.kp = CURRENT_KP;
+  56              		.loc 1 19 0
+  57 001a 0B4B     		ldr	r3, .L3+20
+  58 001c 4FF08045 		mov	r5, #1073741824
+  59 0020 DD60     		str	r5, [r3, #12]	@ float
+  20:Src/bldc.c    ****     piICurr.ki = CURRENT_KI;
+  60              		.loc 1 20 0
+  61 0022 0A4D     		ldr	r5, .L3+24
+  62 0024 1D63     		str	r5, [r3, #48]	@ float
+  21:Src/bldc.c    ****     piICurr.kc = CURRENT_KC;
+  63              		.loc 1 21 0
+  64 0026 5A63     		str	r2, [r3, #52]	@ float
+  22:Src/bldc.c    ****     piICurr.outMin = 1000;
+  65              		.loc 1 22 0
+  66 0028 5C62     		str	r4, [r3, #36]	@ float
+  23:Src/bldc.c    ****     piICurr.outMax = 10000;
+  67              		.loc 1 23 0
+  68 002a 1862     		str	r0, [r3, #32]	@ float
+  24:Src/bldc.c    ****     piICurr.ref = 0;
+  69              		.loc 1 24 0
+  70 002c 1960     		str	r1, [r3]	@ float
+  25:Src/bldc.c    **** }
+  71              		.loc 1 25 0
+  72 002e 30BC     		pop	{r4, r5}
+  73              	.LCFI1:
+  74              		.cfi_restore 5
+  75              		.cfi_restore 4
+  76              		.cfi_def_cfa_offset 0
+  77 0030 7047     		bx	lr
+  78              	.L4:
+  79 0032 00BF     		.align	2
+  80              	.L3:
+  81 0034 00000000 		.word	.LANCHOR0
+  82 0038 CDCC4C3D 		.word	1028443341
+  83 003c 0AD7233C 		.word	1008981770
+  84 0040 00401C46 		.word	1176256512
+  85 0044 00007A44 		.word	1148846080
+  86 0048 00000000 		.word	.LANCHOR1
+  87 004c CDCC4C3E 		.word	1045220557
+  88              		.cfi_endproc
+  89              	.LFE130:
+  91              		.section	.text.threeHallPara_Init,"ax",%progbits
+ARM GAS  C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s 			page 3
+
+
+  92              		.align	1
+  93              		.global	threeHallPara_Init
+  94              		.syntax unified
+  95              		.thumb
+  96              		.thumb_func
+  97              		.fpu fpv4-sp-d16
+  99              	threeHallPara_Init:
+ 100              	.LFB131:
+  26:Src/bldc.c    **** 
+  27:Src/bldc.c    **** void threeHallPara_Init(void)
+  28:Src/bldc.c    **** {
+ 101              		.loc 1 28 0
+ 102              		.cfi_startproc
+ 103              		@ args = 0, pretend = 0, frame = 0
+ 104              		@ frame_needed = 0, uses_anonymous_args = 0
+ 105              		@ link register save eliminated.
+  29:Src/bldc.c    ****     hallTree.poles = MOTOR_POLES;
+ 106              		.loc 1 29 0
+ 107 0000 034B     		ldr	r3, .L6
+ 108 0002 0222     		movs	r2, #2
+ 109 0004 83F82020 		strb	r2, [r3, #32]
+  30:Src/bldc.c    ****     hallTree.speedCoeff = 1600 * 60 / hallTree.poles / 2;
+ 110              		.loc 1 30 0
+ 111 0008 45F6C052 		movw	r2, #24000
+ 112 000c DA61     		str	r2, [r3, #28]
+  31:Src/bldc.c    **** }
+ 113              		.loc 1 31 0
+ 114 000e 7047     		bx	lr
+ 115              	.L7:
+ 116              		.align	2
+ 117              	.L6:
+ 118 0010 00000000 		.word	hallTree
+ 119              		.cfi_endproc
+ 120              	.LFE131:
+ 122              		.section	.text.uHALLEdge,"ax",%progbits
+ 123              		.align	1
+ 124              		.global	uHALLEdge
+ 125              		.syntax unified
+ 126              		.thumb
+ 127              		.thumb_func
+ 128              		.fpu fpv4-sp-d16
+ 130              	uHALLEdge:
+ 131              	.LFB132:
+  32:Src/bldc.c    **** 
+  33:Src/bldc.c    **** uint8_t uHALLEdge(uint8_t val)
+  34:Src/bldc.c    **** {
+ 132              		.loc 1 34 0
+ 133              		.cfi_startproc
+ 134              		@ args = 0, pretend = 0, frame = 0
+ 135              		@ frame_needed = 0, uses_anonymous_args = 0
+ 136              		@ link register save eliminated.
+ 137              	.LVL0:
+  35:Src/bldc.c    ****     static uint8_t oldVal = 0;
+  36:Src/bldc.c    ****     if (oldVal != val)
+ 138              		.loc 1 36 0
+ 139 0000 054B     		ldr	r3, .L13
+ 140 0002 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ARM GAS  C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s 			page 4
+
+
+ 141 0004 8342     		cmp	r3, r0
+ 142 0006 05D0     		beq	.L10
+  37:Src/bldc.c    ****     {
+  38:Src/bldc.c    ****         oldVal = val;
+ 143              		.loc 1 38 0
+ 144 0008 034B     		ldr	r3, .L13
+ 145 000a 1870     		strb	r0, [r3]
+  39:Src/bldc.c    ****         if (val == 0)
+ 146              		.loc 1 39 0
+ 147 000c 08B1     		cbz	r0, .L12
+  40:Src/bldc.c    ****         {
+  41:Src/bldc.c    ****             return 0;
+  42:Src/bldc.c    ****         }
+  43:Src/bldc.c    ****         else
+  44:Src/bldc.c    ****         {
+  45:Src/bldc.c    ****             return 1;
+ 148              		.loc 1 45 0
+ 149 000e 0120     		movs	r0, #1
+ 150              	.LVL1:
+  46:Src/bldc.c    ****         }
+  47:Src/bldc.c    ****     }
+  48:Src/bldc.c    ****     return 2;
+  49:Src/bldc.c    **** }
+ 151              		.loc 1 49 0
+ 152 0010 7047     		bx	lr
+ 153              	.LVL2:
+ 154              	.L12:
+ 155 0012 7047     		bx	lr
+ 156              	.L10:
+  48:Src/bldc.c    **** }
+ 157              		.loc 1 48 0
+ 158 0014 0220     		movs	r0, #2
+ 159              	.LVL3:
+ 160 0016 7047     		bx	lr
+ 161              	.L14:
+ 162              		.align	2
+ 163              	.L13:
+ 164 0018 00000000 		.word	.LANCHOR2
+ 165              		.cfi_endproc
+ 166              	.LFE132:
+ 168              		.global	__aeabi_i2d
+ 169              		.global	__aeabi_dmul
+ 170              		.global	__aeabi_dadd
+ 171              		.global	__aeabi_d2uiz
+ 172              		.section	.text.hallSwitch,"ax",%progbits
+ 173              		.align	1
+ 174              		.global	hallSwitch
+ 175              		.syntax unified
+ 176              		.thumb
+ 177              		.thumb_func
+ 178              		.fpu fpv4-sp-d16
+ 180              	hallSwitch:
+ 181              	.LFB133:
+  50:Src/bldc.c    **** 
+  51:Src/bldc.c    **** void hallSwitch(void)
+  52:Src/bldc.c    **** {
+ 182              		.loc 1 52 0
+ARM GAS  C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s 			page 5
+
+
+ 183              		.cfi_startproc
+ 184              		@ args = 0, pretend = 0, frame = 0
+ 185              		@ frame_needed = 0, uses_anonymous_args = 0
+ 186 0000 2DE9F843 		push	{r3, r4, r5, r6, r7, r8, r9, lr}
+ 187              	.LCFI2:
+ 188              		.cfi_def_cfa_offset 32
+ 189              		.cfi_offset 3, -32
+ 190              		.cfi_offset 4, -28
+ 191              		.cfi_offset 5, -24
+ 192              		.cfi_offset 6, -20
+ 193              		.cfi_offset 7, -16
+ 194              		.cfi_offset 8, -12
+ 195              		.cfi_offset 9, -8
+ 196              		.cfi_offset 14, -4
+  53:Src/bldc.c    ****     hallTree.hallUVW[0] = (HALL_U_STATUS == 1) ? 1 : 0;
+ 197              		.loc 1 53 0
+ 198 0004 B44D     		ldr	r5, .L42+32
+ 199 0006 4021     		movs	r1, #64
+ 200 0008 2846     		mov	r0, r5
+ 201 000a FFF7FEFF 		bl	HAL_GPIO_ReadPin
+ 202              	.LVL4:
+ 203 000e 0128     		cmp	r0, #1
+ 204 0010 14BF     		ite	ne
+ 205 0012 0020     		movne	r0, #0
+ 206 0014 0120     		moveq	r0, #1
+ 207 0016 B14C     		ldr	r4, .L42+36
+ 208 0018 2070     		strb	r0, [r4]
+  54:Src/bldc.c    ****     hallTree.hallUVW[1] = (HALL_V_STATUS == 1) ? 1 : 0;
+ 209              		.loc 1 54 0
+ 210 001a 8021     		movs	r1, #128
+ 211 001c 2846     		mov	r0, r5
+ 212 001e FFF7FEFF 		bl	HAL_GPIO_ReadPin
+ 213              	.LVL5:
+ 214 0022 0128     		cmp	r0, #1
+ 215 0024 14BF     		ite	ne
+ 216 0026 0020     		movne	r0, #0
+ 217 0028 0120     		moveq	r0, #1
+ 218 002a 6070     		strb	r0, [r4, #1]
+  55:Src/bldc.c    ****     hallTree.hallUVW[2] = (HALL_W_STATUS == 1) ? 1 : 0;
+ 219              		.loc 1 55 0
+ 220 002c 4FF48071 		mov	r1, #256
+ 221 0030 2846     		mov	r0, r5
+ 222 0032 FFF7FEFF 		bl	HAL_GPIO_ReadPin
+ 223              	.LVL6:
+ 224 0036 0128     		cmp	r0, #1
+ 225 0038 14BF     		ite	ne
+ 226 003a 0020     		movne	r0, #0
+ 227 003c 0120     		moveq	r0, #1
+ 228 003e A070     		strb	r0, [r4, #2]
+  56:Src/bldc.c    ****     hallTree.filterEdge = uHALLEdge(hallTree.hallUVW[0]);
+ 229              		.loc 1 56 0
+ 230 0040 2078     		ldrb	r0, [r4]	@ zero_extendqisi2
+ 231 0042 FFF7FEFF 		bl	uHALLEdge
+ 232              	.LVL7:
+ 233 0046 85B2     		uxth	r5, r0
+ 234 0048 E584     		strh	r5, [r4, #38]	@ movhi
+  57:Src/bldc.c    ****     if (hallTree.filterEdge == 1)
+ARM GAS  C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s 			page 6
+
+
+ 235              		.loc 1 57 0
+ 236 004a 012D     		cmp	r5, #1
+ 237 004c 29D0     		beq	.L39
+ 238              	.L16:
+  58:Src/bldc.c    ****     {
+  59:Src/bldc.c    ****         FIRSTORDER_LPF_CACL(hallTree.filterCount, hallTree.filterCountF, 0.1379);
+  60:Src/bldc.c    ****         hallTree.speedRPM = hallTree.speedCoeff / hallTree.filterCountF;
+  61:Src/bldc.c    ****         FIRSTORDER_LPF_CACL(hallTree.speedRPM, hallTree.speedRPMF, 0.2379);
+  62:Src/bldc.c    ****         hallTree.filterCount = 0;
+  63:Src/bldc.c    ****     }
+  64:Src/bldc.c    ****     if (hallTree.filterEdge == 0)
+ 239              		.loc 1 64 0
+ 240 004e 15B9     		cbnz	r5, .L17
+  65:Src/bldc.c    ****     {
+  66:Src/bldc.c    ****         hallTree.filterCount = 0;
+ 241              		.loc 1 66 0
+ 242 0050 A24B     		ldr	r3, .L42+36
+ 243 0052 0022     		movs	r2, #0
+ 244 0054 1A85     		strh	r2, [r3, #40]	@ movhi
+ 245              	.L17:
+  67:Src/bldc.c    ****     }
+  68:Src/bldc.c    ****     if (hallTree.filterEdge == 2)
+ 246              		.loc 1 68 0
+ 247 0056 022D     		cmp	r5, #2
+ 248 0058 62D0     		beq	.L40
+ 249              	.L18:
+  69:Src/bldc.c    ****     {
+  70:Src/bldc.c    ****         hallTree.filterCount++;
+  71:Src/bldc.c    ****     }
+  72:Src/bldc.c    ****     hallTree.hallState = hallTree.hallUVW[0] + (hallTree.hallUVW[1] << 1) + (hallTree.hallUVW[2] <<
+ 250              		.loc 1 72 0
+ 251 005a A049     		ldr	r1, .L42+36
+ 252 005c 0B78     		ldrb	r3, [r1]	@ zero_extendqisi2
+ 253 005e 4A78     		ldrb	r2, [r1, #1]	@ zero_extendqisi2
+ 254 0060 5200     		lsls	r2, r2, #1
+ 255 0062 D2B2     		uxtb	r2, r2
+ 256 0064 1344     		add	r3, r3, r2
+ 257 0066 8A78     		ldrb	r2, [r1, #2]	@ zero_extendqisi2
+ 258 0068 9200     		lsls	r2, r2, #2
+ 259 006a D2B2     		uxtb	r2, r2
+ 260 006c 52FA83F3 		uxtab	r3, r2, r3
+ 261 0070 DBB2     		uxtb	r3, r3
+ 262 0072 CB70     		strb	r3, [r1, #3]
+  73:Src/bldc.c    ****     if (!stateContr.INVERSION)
+ 263              		.loc 1 73 0
+ 264 0074 9A4A     		ldr	r2, .L42+40
+ 265 0076 9269     		ldr	r2, [r2, #24]
+ 266 0078 12B9     		cbnz	r2, .L19
+  74:Src/bldc.c    ****     {
+  75:Src/bldc.c    ****         hallTree.hallState = 7 - hallTree.hallState;
+ 267              		.loc 1 75 0
+ 268 007a C3F10703 		rsb	r3, r3, #7
+ 269 007e CB70     		strb	r3, [r1, #3]
+ 270              	.L19:
+  76:Src/bldc.c    ****     }
+  77:Src/bldc.c    ****     if (hallTree.hallState != hallTree.oldHallState)
+ 271              		.loc 1 77 0
+ARM GAS  C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s 			page 7
+
+
+ 272 0080 964A     		ldr	r2, .L42+36
+ 273 0082 D378     		ldrb	r3, [r2, #3]	@ zero_extendqisi2
+ 274 0084 1279     		ldrb	r2, [r2, #4]	@ zero_extendqisi2
+ 275 0086 9342     		cmp	r3, r2
+ 276 0088 6AD0     		beq	.L20
+  78:Src/bldc.c    ****     {
+  79:Src/bldc.c    ****         switch (hallTree.hallState)
+ 277              		.loc 1 79 0
+ 278 008a 013B     		subs	r3, r3, #1
+ 279 008c 052B     		cmp	r3, #5
+ 280 008e 00F2FE80 		bhi	.L21
+ 281 0092 DFE813F0 		tbh	[pc, r3, lsl #1]
+ 282              	.L23:
+ 283 0096 7000     		.2byte	(.L22-.L23)/2
+ 284 0098 A800     		.2byte	(.L24-.L23)/2
+ 285 009a 8C00     		.2byte	(.L25-.L23)/2
+ 286 009c E000     		.2byte	(.L26-.L23)/2
+ 287 009e 4A00     		.2byte	(.L27-.L23)/2
+ 288 00a0 C400     		.2byte	(.L28-.L23)/2
+ 289              		.p2align 1
+ 290              	.L39:
+  59:Src/bldc.c    ****         hallTree.speedRPM = hallTree.speedCoeff / hallTree.filterCountF;
+ 291              		.loc 1 59 0
+ 292 00a2 608D     		ldrh	r0, [r4, #42]
+ 293 00a4 FFF7FEFF 		bl	__aeabi_i2d
+ 294              	.LVL8:
+ 295 00a8 83A3     		adr	r3, .L42
+ 296 00aa D3E90023 		ldrd	r2, [r3]
+ 297 00ae FFF7FEFF 		bl	__aeabi_dmul
+ 298              	.LVL9:
+ 299 00b2 0646     		mov	r6, r0
+ 300 00b4 0F46     		mov	r7, r1
+ 301 00b6 208D     		ldrh	r0, [r4, #40]
+ 302 00b8 FFF7FEFF 		bl	__aeabi_i2d
+ 303              	.LVL10:
+ 304 00bc 80A3     		adr	r3, .L42+8
+ 305 00be D3E90023 		ldrd	r2, [r3]
+ 306 00c2 FFF7FEFF 		bl	__aeabi_dmul
+ 307              	.LVL11:
+ 308 00c6 0246     		mov	r2, r0
+ 309 00c8 0B46     		mov	r3, r1
+ 310 00ca 3046     		mov	r0, r6
+ 311 00cc 3946     		mov	r1, r7
+ 312 00ce FFF7FEFF 		bl	__aeabi_dadd
+ 313              	.LVL12:
+ 314 00d2 FFF7FEFF 		bl	__aeabi_d2uiz
+ 315              	.LVL13:
+ 316 00d6 80B2     		uxth	r0, r0
+ 317 00d8 6085     		strh	r0, [r4, #42]	@ movhi
+  60:Src/bldc.c    ****         FIRSTORDER_LPF_CACL(hallTree.speedRPM, hallTree.speedRPMF, 0.2379);
+ 318              		.loc 1 60 0
+ 319 00da E669     		ldr	r6, [r4, #28]
+ 320 00dc B6FBF0F6 		udiv	r6, r6, r0
+ 321 00e0 B6B2     		uxth	r6, r6
+ 322 00e2 A684     		strh	r6, [r4, #36]	@ movhi
+  61:Src/bldc.c    ****         hallTree.filterCount = 0;
+ 323              		.loc 1 61 0
+ARM GAS  C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s 			page 8
+
+
+ 324 00e4 608C     		ldrh	r0, [r4, #34]
+ 325 00e6 FFF7FEFF 		bl	__aeabi_i2d
+ 326              	.LVL14:
+ 327 00ea 77A3     		adr	r3, .L42+16
+ 328 00ec D3E90023 		ldrd	r2, [r3]
+ 329 00f0 FFF7FEFF 		bl	__aeabi_dmul
+ 330              	.LVL15:
+ 331 00f4 8046     		mov	r8, r0
+ 332 00f6 8946     		mov	r9, r1
+ 333 00f8 3046     		mov	r0, r6
+ 334 00fa FFF7FEFF 		bl	__aeabi_i2d
+ 335              	.LVL16:
+ 336 00fe 74A3     		adr	r3, .L42+24
+ 337 0100 D3E90023 		ldrd	r2, [r3]
+ 338 0104 FFF7FEFF 		bl	__aeabi_dmul
+ 339              	.LVL17:
+ 340 0108 0246     		mov	r2, r0
+ 341 010a 0B46     		mov	r3, r1
+ 342 010c 4046     		mov	r0, r8
+ 343 010e 4946     		mov	r1, r9
+ 344 0110 FFF7FEFF 		bl	__aeabi_dadd
+ 345              	.LVL18:
+ 346 0114 FFF7FEFF 		bl	__aeabi_d2uiz
+ 347              	.LVL19:
+ 348 0118 6084     		strh	r0, [r4, #34]	@ movhi
+  62:Src/bldc.c    ****     }
+ 349              		.loc 1 62 0
+ 350 011a 0023     		movs	r3, #0
+ 351 011c 2385     		strh	r3, [r4, #40]	@ movhi
+ 352 011e 96E7     		b	.L16
+ 353              	.L40:
+  70:Src/bldc.c    ****     }
+ 354              		.loc 1 70 0
+ 355 0120 6E4A     		ldr	r2, .L42+36
+ 356 0122 138D     		ldrh	r3, [r2, #40]
+ 357 0124 0133     		adds	r3, r3, #1
+ 358 0126 1385     		strh	r3, [r2, #40]	@ movhi
+ 359 0128 97E7     		b	.L18
+ 360              	.L27:
+  80:Src/bldc.c    ****         {
+  81:Src/bldc.c    ****         case 0x05:
+  82:Src/bldc.c    ****         {
+  83:Src/bldc.c    ****             MOS_Q41PWM;
+ 361              		.loc 1 83 0
+ 362 012a 6E4B     		ldr	r3, .L42+44
+ 363 012c 1B68     		ldr	r3, [r3]
+ 364 012e 6C4A     		ldr	r2, .L42+40
+ 365 0130 5289     		ldrh	r2, [r2, #10]
+ 366 0132 5A63     		str	r2, [r3, #52]
+ 367 0134 0024     		movs	r4, #0
+ 368 0136 9C63     		str	r4, [r3, #56]
+ 369 0138 DC63     		str	r4, [r3, #60]
+ 370 013a 6B4D     		ldr	r5, .L42+48
+ 371 013c 2246     		mov	r2, r4
+ 372 013e 4FF40051 		mov	r1, #8192
+ 373 0142 2846     		mov	r0, r5
+ 374 0144 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ARM GAS  C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s 			page 9
+
+
+ 375              	.LVL20:
+ 376 0148 2246     		mov	r2, r4
+ 377 014a 4FF40041 		mov	r1, #32768
+ 378 014e 2846     		mov	r0, r5
+ 379 0150 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 380              	.LVL21:
+ 381 0154 0122     		movs	r2, #1
+ 382 0156 4FF48041 		mov	r1, #16384
+ 383 015a 2846     		mov	r0, r5
+ 384 015c FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 385              	.LVL22:
+ 386              	.L20:
+  84:Src/bldc.c    ****         }
+  85:Src/bldc.c    ****         break;
+  86:Src/bldc.c    ****         case 0x01:
+  87:Src/bldc.c    ****         {
+  88:Src/bldc.c    ****             MOS_Q16PWM;
+  89:Src/bldc.c    ****         }
+  90:Src/bldc.c    ****         break;
+  91:Src/bldc.c    ****         case 0x03:
+  92:Src/bldc.c    ****         {
+  93:Src/bldc.c    ****             MOS_Q63PWM;
+  94:Src/bldc.c    ****         }
+  95:Src/bldc.c    ****         break;
+  96:Src/bldc.c    ****         case 0x02:
+  97:Src/bldc.c    ****         {
+  98:Src/bldc.c    ****             MOS_Q32PWM;
+  99:Src/bldc.c    ****         }
+ 100:Src/bldc.c    ****         break;
+ 101:Src/bldc.c    ****         case 0x06:
+ 102:Src/bldc.c    ****         {
+ 103:Src/bldc.c    ****             MOS_Q25PWM;
+ 104:Src/bldc.c    ****         }
+ 105:Src/bldc.c    ****         break;
+ 106:Src/bldc.c    ****         case 0x04:
+ 107:Src/bldc.c    ****         {
+ 108:Src/bldc.c    ****             MOS_Q54PWM;
+ 109:Src/bldc.c    ****         }
+ 110:Src/bldc.c    ****         break;
+ 111:Src/bldc.c    ****         default:
+ 112:Src/bldc.c    ****         {
+ 113:Src/bldc.c    ****             STOP_MOTOR;
+ 114:Src/bldc.c    ****             hallTree.speedRPM = 0;
+ 115:Src/bldc.c    ****         }
+ 116:Src/bldc.c    ****         break;
+ 117:Src/bldc.c    ****         }
+ 118:Src/bldc.c    ****     }
+ 119:Src/bldc.c    ****     if (hallTree.oldHallState == hallTree.hallState)
+ 387              		.loc 1 119 0
+ 388 0160 5E4B     		ldr	r3, .L42+36
+ 389 0162 1A79     		ldrb	r2, [r3, #4]	@ zero_extendqisi2
+ 390 0164 DB78     		ldrb	r3, [r3, #3]	@ zero_extendqisi2
+ 391 0166 9A42     		cmp	r2, r3
+ 392 0168 00F0C280 		beq	.L41
+ 393              	.L29:
+ 120:Src/bldc.c    ****     {
+ 121:Src/bldc.c    ****         switch (hallTree.hallState)
+ARM GAS  C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s 			page 10
+
+
+ 122:Src/bldc.c    ****         {
+ 123:Src/bldc.c    ****         case 0x05:
+ 124:Src/bldc.c    ****         {
+ 125:Src/bldc.c    ****             MOS_Q41PWM;
+ 126:Src/bldc.c    ****         }
+ 127:Src/bldc.c    ****         break;
+ 128:Src/bldc.c    ****         case 0x01:
+ 129:Src/bldc.c    ****         {
+ 130:Src/bldc.c    ****             MOS_Q16PWM;
+ 131:Src/bldc.c    ****         }
+ 132:Src/bldc.c    ****         break;
+ 133:Src/bldc.c    ****         case 0x03:
+ 134:Src/bldc.c    ****         {
+ 135:Src/bldc.c    ****             MOS_Q63PWM;
+ 136:Src/bldc.c    ****         }
+ 137:Src/bldc.c    ****         break;
+ 138:Src/bldc.c    ****         case 0x02:
+ 139:Src/bldc.c    ****         {
+ 140:Src/bldc.c    ****             MOS_Q32PWM;
+ 141:Src/bldc.c    ****         }
+ 142:Src/bldc.c    ****         break;
+ 143:Src/bldc.c    ****         case 0x06:
+ 144:Src/bldc.c    ****         {
+ 145:Src/bldc.c    ****             MOS_Q25PWM;
+ 146:Src/bldc.c    ****         }
+ 147:Src/bldc.c    ****         break;
+ 148:Src/bldc.c    ****         case 0x04:
+ 149:Src/bldc.c    ****         {
+ 150:Src/bldc.c    ****             MOS_Q54PWM;
+ 151:Src/bldc.c    ****         }
+ 152:Src/bldc.c    ****         break;
+ 153:Src/bldc.c    ****         default:
+ 154:Src/bldc.c    ****         {
+ 155:Src/bldc.c    ****             STOP_MOTOR;
+ 156:Src/bldc.c    ****             hallTree.speedRPM = 0;
+ 157:Src/bldc.c    ****         }
+ 158:Src/bldc.c    ****         break;
+ 159:Src/bldc.c    ****         }
+ 160:Src/bldc.c    ****     }
+ 161:Src/bldc.c    ****     hallTree.oldHallState = hallTree.hallState;
+ 394              		.loc 1 161 0
+ 395 016c 5B4B     		ldr	r3, .L42+36
+ 396 016e DA78     		ldrb	r2, [r3, #3]	@ zero_extendqisi2
+ 397 0170 1A71     		strb	r2, [r3, #4]
+ 162:Src/bldc.c    **** }
+ 398              		.loc 1 162 0
+ 399 0172 BDE8F883 		pop	{r3, r4, r5, r6, r7, r8, r9, pc}
+ 400              	.L22:
+  88:Src/bldc.c    ****         }
+ 401              		.loc 1 88 0
+ 402 0176 5B4B     		ldr	r3, .L42+44
+ 403 0178 1B68     		ldr	r3, [r3]
+ 404 017a 594A     		ldr	r2, .L42+40
+ 405 017c 5289     		ldrh	r2, [r2, #10]
+ 406 017e 5A63     		str	r2, [r3, #52]
+ 407 0180 0024     		movs	r4, #0
+ 408 0182 9C63     		str	r4, [r3, #56]
+ARM GAS  C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s 			page 11
+
+
+ 409 0184 DC63     		str	r4, [r3, #60]
+ 410 0186 584D     		ldr	r5, .L42+48
+ 411 0188 2246     		mov	r2, r4
+ 412 018a 4FF40051 		mov	r1, #8192
+ 413 018e 2846     		mov	r0, r5
+ 414 0190 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 415              	.LVL23:
+ 416 0194 2246     		mov	r2, r4
+ 417 0196 4FF48041 		mov	r1, #16384
+ 418 019a 2846     		mov	r0, r5
+ 419 019c FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 420              	.LVL24:
+ 421 01a0 0122     		movs	r2, #1
+ 422 01a2 4FF40041 		mov	r1, #32768
+ 423 01a6 2846     		mov	r0, r5
+ 424 01a8 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 425              	.LVL25:
+  90:Src/bldc.c    ****         case 0x03:
+ 426              		.loc 1 90 0
+ 427 01ac D8E7     		b	.L20
+ 428              	.L25:
+  93:Src/bldc.c    ****         }
+ 429              		.loc 1 93 0
+ 430 01ae 4D4B     		ldr	r3, .L42+44
+ 431 01b0 1B68     		ldr	r3, [r3]
+ 432 01b2 0024     		movs	r4, #0
+ 433 01b4 5C63     		str	r4, [r3, #52]
+ 434 01b6 4A4A     		ldr	r2, .L42+40
+ 435 01b8 5289     		ldrh	r2, [r2, #10]
+ 436 01ba 9A63     		str	r2, [r3, #56]
+ 437 01bc DC63     		str	r4, [r3, #60]
+ 438 01be 4A4D     		ldr	r5, .L42+48
+ 439 01c0 2246     		mov	r2, r4
+ 440 01c2 4FF40051 		mov	r1, #8192
+ 441 01c6 2846     		mov	r0, r5
+ 442 01c8 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 443              	.LVL26:
+ 444 01cc 2246     		mov	r2, r4
+ 445 01ce 4FF48041 		mov	r1, #16384
+ 446 01d2 2846     		mov	r0, r5
+ 447 01d4 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 448              	.LVL27:
+ 449 01d8 0122     		movs	r2, #1
+ 450 01da 4FF40041 		mov	r1, #32768
+ 451 01de 2846     		mov	r0, r5
+ 452 01e0 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 453              	.LVL28:
+  95:Src/bldc.c    ****         case 0x02:
+ 454              		.loc 1 95 0
+ 455 01e4 BCE7     		b	.L20
+ 456              	.L24:
+  98:Src/bldc.c    ****         }
+ 457              		.loc 1 98 0
+ 458 01e6 3F4B     		ldr	r3, .L42+44
+ 459 01e8 1B68     		ldr	r3, [r3]
+ 460 01ea 0024     		movs	r4, #0
+ 461 01ec 5C63     		str	r4, [r3, #52]
+ARM GAS  C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s 			page 12
+
+
+ 462 01ee 3C4A     		ldr	r2, .L42+40
+ 463 01f0 5289     		ldrh	r2, [r2, #10]
+ 464 01f2 9A63     		str	r2, [r3, #56]
+ 465 01f4 DC63     		str	r4, [r3, #60]
+ 466 01f6 3C4D     		ldr	r5, .L42+48
+ 467 01f8 2246     		mov	r2, r4
+ 468 01fa 4FF48041 		mov	r1, #16384
+ 469 01fe 2846     		mov	r0, r5
+ 470 0200 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 471              	.LVL29:
+ 472 0204 2246     		mov	r2, r4
+ 473 0206 4FF40041 		mov	r1, #32768
+ 474 020a 2846     		mov	r0, r5
+ 475 020c FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 476              	.LVL30:
+ 477 0210 0122     		movs	r2, #1
+ 478 0212 4FF40051 		mov	r1, #8192
+ 479 0216 2846     		mov	r0, r5
+ 480 0218 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 481              	.LVL31:
+ 100:Src/bldc.c    ****         case 0x06:
+ 482              		.loc 1 100 0
+ 483 021c A0E7     		b	.L20
+ 484              	.L28:
+ 103:Src/bldc.c    ****         }
+ 485              		.loc 1 103 0
+ 486 021e 314B     		ldr	r3, .L42+44
+ 487 0220 1B68     		ldr	r3, [r3]
+ 488 0222 0024     		movs	r4, #0
+ 489 0224 5C63     		str	r4, [r3, #52]
+ 490 0226 9C63     		str	r4, [r3, #56]
+ 491 0228 2D4A     		ldr	r2, .L42+40
+ 492 022a 5289     		ldrh	r2, [r2, #10]
+ 493 022c DA63     		str	r2, [r3, #60]
+ 494 022e 2E4D     		ldr	r5, .L42+48
+ 495 0230 2246     		mov	r2, r4
+ 496 0232 4FF48041 		mov	r1, #16384
+ 497 0236 2846     		mov	r0, r5
+ 498 0238 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 499              	.LVL32:
+ 500 023c 2246     		mov	r2, r4
+ 501 023e 4FF40041 		mov	r1, #32768
+ 502 0242 2846     		mov	r0, r5
+ 503 0244 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 504              	.LVL33:
+ 505 0248 0122     		movs	r2, #1
+ 506 024a 4FF40051 		mov	r1, #8192
+ 507 024e 2846     		mov	r0, r5
+ 508 0250 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 509              	.LVL34:
+ 105:Src/bldc.c    ****         case 0x04:
+ 510              		.loc 1 105 0
+ 511 0254 84E7     		b	.L20
+ 512              	.L26:
+ 108:Src/bldc.c    ****         }
+ 513              		.loc 1 108 0
+ 514 0256 234B     		ldr	r3, .L42+44
+ARM GAS  C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s 			page 13
+
+
+ 515 0258 1B68     		ldr	r3, [r3]
+ 516 025a 0024     		movs	r4, #0
+ 517 025c 5C63     		str	r4, [r3, #52]
+ 518 025e 9C63     		str	r4, [r3, #56]
+ 519 0260 1F4A     		ldr	r2, .L42+40
+ 520 0262 5289     		ldrh	r2, [r2, #10]
+ 521 0264 DA63     		str	r2, [r3, #60]
+ 522 0266 204D     		ldr	r5, .L42+48
+ 523 0268 2246     		mov	r2, r4
+ 524 026a 4FF40051 		mov	r1, #8192
+ 525 026e 2846     		mov	r0, r5
+ 526 0270 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 527              	.LVL35:
+ 528 0274 2246     		mov	r2, r4
+ 529 0276 4FF40041 		mov	r1, #32768
+ 530 027a 2846     		mov	r0, r5
+ 531 027c FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 532              	.LVL36:
+ 533 0280 0122     		movs	r2, #1
+ 534 0282 4FF48041 		mov	r1, #16384
+ 535 0286 2846     		mov	r0, r5
+ 536 0288 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 537              	.LVL37:
+ 110:Src/bldc.c    ****         default:
+ 538              		.loc 1 110 0
+ 539 028c 68E7     		b	.L20
+ 540              	.L21:
+ 113:Src/bldc.c    ****             hallTree.speedRPM = 0;
+ 541              		.loc 1 113 0
+ 542 028e 174C     		ldr	r4, .L42+52
+ 543 0290 0022     		movs	r2, #0
+ 544 0292 1146     		mov	r1, r2
+ 545 0294 2046     		mov	r0, r4
+ 546 0296 FFF7FEFF 		bl	TIM_CCxChannelCmd
+ 547              	.LVL38:
+ 548 029a 0022     		movs	r2, #0
+ 549 029c 0421     		movs	r1, #4
+ 550 029e 2046     		mov	r0, r4
+ 551 02a0 FFF7FEFF 		bl	TIM_CCxChannelCmd
+ 552              	.LVL39:
+ 553 02a4 0022     		movs	r2, #0
+ 554 02a6 0821     		movs	r1, #8
+ 555 02a8 2046     		mov	r0, r4
+ 556 02aa FFF7FEFF 		bl	TIM_CCxChannelCmd
+ 557              	.LVL40:
+ 114:Src/bldc.c    ****         }
+ 558              		.loc 1 114 0
+ 559 02ae 0B4B     		ldr	r3, .L42+36
+ 560 02b0 0022     		movs	r2, #0
+ 561 02b2 9A84     		strh	r2, [r3, #36]	@ movhi
+ 116:Src/bldc.c    ****         }
+ 562              		.loc 1 116 0
+ 563 02b4 54E7     		b	.L20
+ 564              	.L43:
+ 565 02b6 00BF     		.align	3
+ 566              	.L42:
+ 567 02b8 11363CBD 		.word	-1120127471
+ARM GAS  C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s 			page 14
+
+
+ 568 02bc 5296EB3F 		.word	1072404050
+ 569 02c0 BB270F0B 		.word	185542587
+ 570 02c4 B5A6C13F 		.word	1069655733
+ 571 02c8 DE02098A 		.word	-1979120930
+ 572 02cc 1F63E83F 		.word	1072194335
+ 573 02d0 88F4DBD7 		.word	-673450872
+ 574 02d4 8173CE3F 		.word	1070494593
+ 575 02d8 00080240 		.word	1073874944
+ 576 02dc 00000000 		.word	hallTree
+ 577 02e0 00000000 		.word	stateContr
+ 578 02e4 00000000 		.word	htim1
+ 579 02e8 00040240 		.word	1073873920
+ 580 02ec 00000140 		.word	1073807360
+ 581              	.L41:
+ 121:Src/bldc.c    ****         {
+ 582              		.loc 1 121 0
+ 583 02f0 013B     		subs	r3, r3, #1
+ 584 02f2 052B     		cmp	r3, #5
+ 585 02f4 00F2AD80 		bhi	.L30
+ 586 02f8 DFE803F0 		tbb	[pc, r3]
+ 587              	.L32:
+ 588 02fc 1F       		.byte	(.L31-.L32)/2
+ 589 02fd 57       		.byte	(.L33-.L32)/2
+ 590 02fe 3B       		.byte	(.L34-.L32)/2
+ 591 02ff 8F       		.byte	(.L35-.L32)/2
+ 592 0300 03       		.byte	(.L36-.L32)/2
+ 593 0301 73       		.byte	(.L37-.L32)/2
+ 594              		.p2align 1
+ 595              	.L36:
+ 125:Src/bldc.c    ****         }
+ 596              		.loc 1 125 0
+ 597 0302 5E4B     		ldr	r3, .L44
+ 598 0304 1B68     		ldr	r3, [r3]
+ 599 0306 5E4A     		ldr	r2, .L44+4
+ 600 0308 5289     		ldrh	r2, [r2, #10]
+ 601 030a 5A63     		str	r2, [r3, #52]
+ 602 030c 0024     		movs	r4, #0
+ 603 030e 9C63     		str	r4, [r3, #56]
+ 604 0310 DC63     		str	r4, [r3, #60]
+ 605 0312 5C4D     		ldr	r5, .L44+8
+ 606 0314 2246     		mov	r2, r4
+ 607 0316 4FF40051 		mov	r1, #8192
+ 608 031a 2846     		mov	r0, r5
+ 609 031c FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 610              	.LVL41:
+ 611 0320 2246     		mov	r2, r4
+ 612 0322 4FF40041 		mov	r1, #32768
+ 613 0326 2846     		mov	r0, r5
+ 614 0328 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 615              	.LVL42:
+ 616 032c 0122     		movs	r2, #1
+ 617 032e 4FF48041 		mov	r1, #16384
+ 618 0332 2846     		mov	r0, r5
+ 619 0334 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 620              	.LVL43:
+ 127:Src/bldc.c    ****         case 0x01:
+ 621              		.loc 1 127 0
+ARM GAS  C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s 			page 15
+
+
+ 622 0338 18E7     		b	.L29
+ 623              	.L31:
+ 130:Src/bldc.c    ****         }
+ 624              		.loc 1 130 0
+ 625 033a 504B     		ldr	r3, .L44
+ 626 033c 1B68     		ldr	r3, [r3]
+ 627 033e 504A     		ldr	r2, .L44+4
+ 628 0340 5289     		ldrh	r2, [r2, #10]
+ 629 0342 5A63     		str	r2, [r3, #52]
+ 630 0344 0024     		movs	r4, #0
+ 631 0346 9C63     		str	r4, [r3, #56]
+ 632 0348 DC63     		str	r4, [r3, #60]
+ 633 034a 4E4D     		ldr	r5, .L44+8
+ 634 034c 2246     		mov	r2, r4
+ 635 034e 4FF40051 		mov	r1, #8192
+ 636 0352 2846     		mov	r0, r5
+ 637 0354 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 638              	.LVL44:
+ 639 0358 2246     		mov	r2, r4
+ 640 035a 4FF48041 		mov	r1, #16384
+ 641 035e 2846     		mov	r0, r5
+ 642 0360 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 643              	.LVL45:
+ 644 0364 0122     		movs	r2, #1
+ 645 0366 4FF40041 		mov	r1, #32768
+ 646 036a 2846     		mov	r0, r5
+ 647 036c FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 648              	.LVL46:
+ 132:Src/bldc.c    ****         case 0x03:
+ 649              		.loc 1 132 0
+ 650 0370 FCE6     		b	.L29
+ 651              	.L34:
+ 135:Src/bldc.c    ****         }
+ 652              		.loc 1 135 0
+ 653 0372 424B     		ldr	r3, .L44
+ 654 0374 1B68     		ldr	r3, [r3]
+ 655 0376 0024     		movs	r4, #0
+ 656 0378 5C63     		str	r4, [r3, #52]
+ 657 037a 414A     		ldr	r2, .L44+4
+ 658 037c 5289     		ldrh	r2, [r2, #10]
+ 659 037e 9A63     		str	r2, [r3, #56]
+ 660 0380 DC63     		str	r4, [r3, #60]
+ 661 0382 404D     		ldr	r5, .L44+8
+ 662 0384 2246     		mov	r2, r4
+ 663 0386 4FF40051 		mov	r1, #8192
+ 664 038a 2846     		mov	r0, r5
+ 665 038c FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 666              	.LVL47:
+ 667 0390 2246     		mov	r2, r4
+ 668 0392 4FF48041 		mov	r1, #16384
+ 669 0396 2846     		mov	r0, r5
+ 670 0398 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 671              	.LVL48:
+ 672 039c 0122     		movs	r2, #1
+ 673 039e 4FF40041 		mov	r1, #32768
+ 674 03a2 2846     		mov	r0, r5
+ 675 03a4 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ARM GAS  C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s 			page 16
+
+
+ 676              	.LVL49:
+ 137:Src/bldc.c    ****         case 0x02:
+ 677              		.loc 1 137 0
+ 678 03a8 E0E6     		b	.L29
+ 679              	.L33:
+ 140:Src/bldc.c    ****         }
+ 680              		.loc 1 140 0
+ 681 03aa 344B     		ldr	r3, .L44
+ 682 03ac 1B68     		ldr	r3, [r3]
+ 683 03ae 0024     		movs	r4, #0
+ 684 03b0 5C63     		str	r4, [r3, #52]
+ 685 03b2 334A     		ldr	r2, .L44+4
+ 686 03b4 5289     		ldrh	r2, [r2, #10]
+ 687 03b6 9A63     		str	r2, [r3, #56]
+ 688 03b8 DC63     		str	r4, [r3, #60]
+ 689 03ba 324D     		ldr	r5, .L44+8
+ 690 03bc 2246     		mov	r2, r4
+ 691 03be 4FF48041 		mov	r1, #16384
+ 692 03c2 2846     		mov	r0, r5
+ 693 03c4 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 694              	.LVL50:
+ 695 03c8 2246     		mov	r2, r4
+ 696 03ca 4FF40041 		mov	r1, #32768
+ 697 03ce 2846     		mov	r0, r5
+ 698 03d0 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 699              	.LVL51:
+ 700 03d4 0122     		movs	r2, #1
+ 701 03d6 4FF40051 		mov	r1, #8192
+ 702 03da 2846     		mov	r0, r5
+ 703 03dc FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 704              	.LVL52:
+ 142:Src/bldc.c    ****         case 0x06:
+ 705              		.loc 1 142 0
+ 706 03e0 C4E6     		b	.L29
+ 707              	.L37:
+ 145:Src/bldc.c    ****         }
+ 708              		.loc 1 145 0
+ 709 03e2 264B     		ldr	r3, .L44
+ 710 03e4 1B68     		ldr	r3, [r3]
+ 711 03e6 0024     		movs	r4, #0
+ 712 03e8 5C63     		str	r4, [r3, #52]
+ 713 03ea 9C63     		str	r4, [r3, #56]
+ 714 03ec 244A     		ldr	r2, .L44+4
+ 715 03ee 5289     		ldrh	r2, [r2, #10]
+ 716 03f0 DA63     		str	r2, [r3, #60]
+ 717 03f2 244D     		ldr	r5, .L44+8
+ 718 03f4 2246     		mov	r2, r4
+ 719 03f6 4FF48041 		mov	r1, #16384
+ 720 03fa 2846     		mov	r0, r5
+ 721 03fc FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 722              	.LVL53:
+ 723 0400 2246     		mov	r2, r4
+ 724 0402 4FF40041 		mov	r1, #32768
+ 725 0406 2846     		mov	r0, r5
+ 726 0408 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 727              	.LVL54:
+ 728 040c 0122     		movs	r2, #1
+ARM GAS  C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s 			page 17
+
+
+ 729 040e 4FF40051 		mov	r1, #8192
+ 730 0412 2846     		mov	r0, r5
+ 731 0414 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 732              	.LVL55:
+ 147:Src/bldc.c    ****         case 0x04:
+ 733              		.loc 1 147 0
+ 734 0418 A8E6     		b	.L29
+ 735              	.L35:
+ 150:Src/bldc.c    ****         }
+ 736              		.loc 1 150 0
+ 737 041a 184B     		ldr	r3, .L44
+ 738 041c 1B68     		ldr	r3, [r3]
+ 739 041e 0024     		movs	r4, #0
+ 740 0420 5C63     		str	r4, [r3, #52]
+ 741 0422 9C63     		str	r4, [r3, #56]
+ 742 0424 164A     		ldr	r2, .L44+4
+ 743 0426 5289     		ldrh	r2, [r2, #10]
+ 744 0428 DA63     		str	r2, [r3, #60]
+ 745 042a 164D     		ldr	r5, .L44+8
+ 746 042c 2246     		mov	r2, r4
+ 747 042e 4FF40051 		mov	r1, #8192
+ 748 0432 2846     		mov	r0, r5
+ 749 0434 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 750              	.LVL56:
+ 751 0438 2246     		mov	r2, r4
+ 752 043a 4FF40041 		mov	r1, #32768
+ 753 043e 2846     		mov	r0, r5
+ 754 0440 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 755              	.LVL57:
+ 756 0444 0122     		movs	r2, #1
+ 757 0446 4FF48041 		mov	r1, #16384
+ 758 044a 2846     		mov	r0, r5
+ 759 044c FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 760              	.LVL58:
+ 152:Src/bldc.c    ****         default:
+ 761              		.loc 1 152 0
+ 762 0450 8CE6     		b	.L29
+ 763              	.L30:
+ 155:Src/bldc.c    ****             hallTree.speedRPM = 0;
+ 764              		.loc 1 155 0
+ 765 0452 0D4C     		ldr	r4, .L44+12
+ 766 0454 0022     		movs	r2, #0
+ 767 0456 1146     		mov	r1, r2
+ 768 0458 2046     		mov	r0, r4
+ 769 045a FFF7FEFF 		bl	TIM_CCxChannelCmd
+ 770              	.LVL59:
+ 771 045e 0022     		movs	r2, #0
+ 772 0460 0421     		movs	r1, #4
+ 773 0462 2046     		mov	r0, r4
+ 774 0464 FFF7FEFF 		bl	TIM_CCxChannelCmd
+ 775              	.LVL60:
+ 776 0468 0022     		movs	r2, #0
+ 777 046a 0821     		movs	r1, #8
+ 778 046c 2046     		mov	r0, r4
+ 779 046e FFF7FEFF 		bl	TIM_CCxChannelCmd
+ 780              	.LVL61:
+ 156:Src/bldc.c    ****         }
+ARM GAS  C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s 			page 18
+
+
+ 781              		.loc 1 156 0
+ 782 0472 064B     		ldr	r3, .L44+16
+ 783 0474 0022     		movs	r2, #0
+ 784 0476 9A84     		strh	r2, [r3, #36]	@ movhi
+ 158:Src/bldc.c    ****         }
+ 785              		.loc 1 158 0
+ 786 0478 78E6     		b	.L29
+ 787              	.L45:
+ 788 047a 00BF     		.align	2
+ 789              	.L44:
+ 790 047c 00000000 		.word	htim1
+ 791 0480 00000000 		.word	stateContr
+ 792 0484 00040240 		.word	1073873920
+ 793 0488 00000140 		.word	1073807360
+ 794 048c 00000000 		.word	hallTree
+ 795              		.cfi_endproc
+ 796              	.LFE133:
+ 798              		.section	.text.offsetCurrentRead,"ax",%progbits
+ 799              		.align	1
+ 800              		.global	offsetCurrentRead
+ 801              		.syntax unified
+ 802              		.thumb
+ 803              		.thumb_func
+ 804              		.fpu fpv4-sp-d16
+ 806              	offsetCurrentRead:
+ 807              	.LFB134:
+ 163:Src/bldc.c    **** 
+ 164:Src/bldc.c    **** void offsetCurrentRead(void)
+ 165:Src/bldc.c    **** {
+ 808              		.loc 1 165 0
+ 809              		.cfi_startproc
+ 810              		@ args = 0, pretend = 0, frame = 0
+ 811              		@ frame_needed = 0, uses_anonymous_args = 0
+ 812              		@ link register save eliminated.
+ 813              	.LVL62:
+ 166:Src/bldc.c    ****     static uint16_t ADC_PhaseU_Curr[64];
+ 167:Src/bldc.c    ****     static uint16_t ADC_PhaseV_Curr[64];
+ 168:Src/bldc.c    ****     static uint16_t ADC_PhaseW_Curr[64];
+ 169:Src/bldc.c    ****     uint8_t i = 0;
+ 170:Src/bldc.c    **** 
+ 171:Src/bldc.c    ****     ADC_PhaseU_Curr[i] = ADC_DualConvertValTab[0];
+ 814              		.loc 1 171 0
+ 815 0000 164B     		ldr	r3, .L55
+ 816 0002 1988     		ldrh	r1, [r3]
+ 817 0004 164A     		ldr	r2, .L55+4
+ 818 0006 1180     		strh	r1, [r2]	@ movhi
+ 172:Src/bldc.c    ****     ADC_PhaseV_Curr[i] = ADC_DualConvertValTab[1];
+ 819              		.loc 1 172 0
+ 820 0008 5988     		ldrh	r1, [r3, #2]
+ 821 000a 164A     		ldr	r2, .L55+8
+ 822 000c 1180     		strh	r1, [r2]	@ movhi
+ 173:Src/bldc.c    ****     ADC_PhaseW_Curr[i] = ADC_DualConvertValTab[4];
+ 823              		.loc 1 173 0
+ 824 000e 1A89     		ldrh	r2, [r3, #8]
+ 825 0010 154B     		ldr	r3, .L55+12
+ 826 0012 1A80     		strh	r2, [r3]	@ movhi
+ 827              	.LVL63:
+ARM GAS  C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s 			page 19
+
+
+ 174:Src/bldc.c    **** 
+ 175:Src/bldc.c    ****     i++;
+ 176:Src/bldc.c    ****     if (i >= 64)
+ 177:Src/bldc.c    ****     {
+ 178:Src/bldc.c    ****         i = 0;
+ 179:Src/bldc.c    ****     }
+ 180:Src/bldc.c    ****     if (stateContr.driveCar == 0)
+ 828              		.loc 1 180 0
+ 829 0014 154B     		ldr	r3, .L55+16
+ 830 0016 9B78     		ldrb	r3, [r3, #2]	@ zero_extendqisi2
+ 831 0018 23B9     		cbnz	r3, .L54
+ 165:Src/bldc.c    ****     static uint16_t ADC_PhaseU_Curr[64];
+ 832              		.loc 1 165 0
+ 833 001a 10B4     		push	{r4}
+ 834              	.LCFI3:
+ 835              		.cfi_def_cfa_offset 4
+ 836              		.cfi_offset 4, -4
+ 837              	.LBB2:
+ 181:Src/bldc.c    ****     {
+ 182:Src/bldc.c    ****         uint32_t sum_U = 0;
+ 183:Src/bldc.c    ****         uint32_t sum_V = 0;
+ 184:Src/bldc.c    ****         uint32_t sum_W = 0;
+ 838              		.loc 1 184 0
+ 839 001c 0022     		movs	r2, #0
+ 183:Src/bldc.c    ****         uint32_t sum_W = 0;
+ 840              		.loc 1 183 0
+ 841 001e 1146     		mov	r1, r2
+ 182:Src/bldc.c    ****         uint32_t sum_V = 0;
+ 842              		.loc 1 182 0
+ 843 0020 1046     		mov	r0, r2
+ 844 0022 0EE0     		b	.L47
+ 845              	.L54:
+ 846              	.LCFI4:
+ 847              		.cfi_def_cfa_offset 0
+ 848              		.cfi_restore 4
+ 849              	.LBE2:
+ 850 0024 7047     		bx	lr
+ 851              	.LVL64:
+ 852              	.L49:
+ 853              	.LCFI5:
+ 854              		.cfi_def_cfa_offset 4
+ 855              		.cfi_offset 4, -4
+ 856              	.LBB3:
+ 185:Src/bldc.c    ****         for (i = 0; i < 64; i++)
+ 186:Src/bldc.c    ****         {
+ 187:Src/bldc.c    ****             sum_U += ADC_PhaseU_Curr[i];
+ 857              		.loc 1 187 0 discriminator 3
+ 858 0026 0E4C     		ldr	r4, .L55+4
+ 859 0028 34F81340 		ldrh	r4, [r4, r3, lsl #1]
+ 860 002c 2044     		add	r0, r0, r4
+ 861              	.LVL65:
+ 188:Src/bldc.c    ****             sum_V += ADC_PhaseV_Curr[i];
+ 862              		.loc 1 188 0 discriminator 3
+ 863 002e 0D4C     		ldr	r4, .L55+8
+ 864 0030 34F81340 		ldrh	r4, [r4, r3, lsl #1]
+ 865 0034 2144     		add	r1, r1, r4
+ 866              	.LVL66:
+ARM GAS  C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s 			page 20
+
+
+ 189:Src/bldc.c    ****             sum_W += ADC_PhaseW_Curr[i];
+ 867              		.loc 1 189 0 discriminator 3
+ 868 0036 0C4C     		ldr	r4, .L55+12
+ 869 0038 34F81340 		ldrh	r4, [r4, r3, lsl #1]
+ 870 003c 2244     		add	r2, r2, r4
+ 871              	.LVL67:
+ 185:Src/bldc.c    ****         for (i = 0; i < 64; i++)
+ 872              		.loc 1 185 0 discriminator 3
+ 873 003e 0133     		adds	r3, r3, #1
+ 874              	.LVL68:
+ 875 0040 DBB2     		uxtb	r3, r3
+ 876              	.LVL69:
+ 877              	.L47:
+ 185:Src/bldc.c    ****         for (i = 0; i < 64; i++)
+ 878              		.loc 1 185 0 is_stmt 0 discriminator 1
+ 879 0042 3F2B     		cmp	r3, #63
+ 880 0044 EFD9     		bls	.L49
+ 190:Src/bldc.c    ****         }
+ 191:Src/bldc.c    ****         ADCSampPare.offsetPhaseU_Curr = sum_U / 64;
+ 881              		.loc 1 191 0 is_stmt 1
+ 882 0046 8009     		lsrs	r0, r0, #6
+ 883              	.LVL70:
+ 884 0048 094B     		ldr	r3, .L55+20
+ 885              	.LVL71:
+ 886 004a D861     		str	r0, [r3, #28]
+ 192:Src/bldc.c    ****         ADCSampPare.offsetPhaseV_Curr = sum_V / 64;
+ 887              		.loc 1 192 0
+ 888 004c 8909     		lsrs	r1, r1, #6
+ 889              	.LVL72:
+ 890 004e 1962     		str	r1, [r3, #32]
+ 193:Src/bldc.c    ****         ADCSampPare.offsetPhaseW_Curr = sum_W / 64;
+ 891              		.loc 1 193 0
+ 892 0050 9209     		lsrs	r2, r2, #6
+ 893              	.LVL73:
+ 894 0052 5A62     		str	r2, [r3, #36]
+ 895              	.LBE3:
+ 194:Src/bldc.c    ****     }
+ 195:Src/bldc.c    **** }
+ 896              		.loc 1 195 0
+ 897 0054 5DF8044B 		ldr	r4, [sp], #4
+ 898              	.LCFI6:
+ 899              		.cfi_restore 4
+ 900              		.cfi_def_cfa_offset 0
+ 901 0058 7047     		bx	lr
+ 902              	.L56:
+ 903 005a 00BF     		.align	2
+ 904              	.L55:
+ 905 005c 00000000 		.word	ADC_DualConvertValTab
+ 906 0060 00000000 		.word	.LANCHOR3
+ 907 0064 00000000 		.word	.LANCHOR4
+ 908 0068 00000000 		.word	.LANCHOR5
+ 909 006c 00000000 		.word	stateContr
+ 910 0070 00000000 		.word	.LANCHOR6
+ 911              		.cfi_endproc
+ 912              	.LFE134:
+ 914              		.section	.text.HALL_ADCSample,"ax",%progbits
+ 915              		.align	1
+ARM GAS  C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s 			page 21
+
+
+ 916              		.global	HALL_ADCSample
+ 917              		.syntax unified
+ 918              		.thumb
+ 919              		.thumb_func
+ 920              		.fpu fpv4-sp-d16
+ 922              	HALL_ADCSample:
+ 923              	.LFB135:
+ 196:Src/bldc.c    **** 
+ 197:Src/bldc.c    **** void HALL_ADCSample(void)
+ 198:Src/bldc.c    **** {
+ 924              		.loc 1 198 0
+ 925              		.cfi_startproc
+ 926              		@ args = 0, pretend = 0, frame = 0
+ 927              		@ frame_needed = 0, uses_anonymous_args = 0
+ 928              		@ link register save eliminated.
+ 929 0000 30B4     		push	{r4, r5}
+ 930              	.LCFI7:
+ 931              		.cfi_def_cfa_offset 8
+ 932              		.cfi_offset 4, -8
+ 933              		.cfi_offset 5, -4
+ 199:Src/bldc.c    ****     ADCSampPare.phaseUCurr = ADC_DualConvertValTab[0] - ADCSampPare.offsetPhaseU_Curr;
+ 934              		.loc 1 199 0
+ 935 0002 1948     		ldr	r0, .L67
+ 936 0004 0188     		ldrh	r1, [r0]
+ 937 0006 194B     		ldr	r3, .L67+4
+ 938 0008 DA69     		ldr	r2, [r3, #28]
+ 939 000a 891A     		subs	r1, r1, r2
+ 940 000c D960     		str	r1, [r3, #12]
+ 200:Src/bldc.c    ****     ADCSampPare.phaseVCurr = ADC_DualConvertValTab[1] - ADCSampPare.offsetPhaseV_Curr;
+ 941              		.loc 1 200 0
+ 942 000e 4288     		ldrh	r2, [r0, #2]
+ 943 0010 1C6A     		ldr	r4, [r3, #32]
+ 944 0012 121B     		subs	r2, r2, r4
+ 945 0014 1A61     		str	r2, [r3, #16]
+ 201:Src/bldc.c    ****     ADCSampPare.phaseWCurr = ADC_DualConvertValTab[2] - ADCSampPare.offsetPhaseW_Curr;
+ 946              		.loc 1 201 0
+ 947 0016 8488     		ldrh	r4, [r0, #4]
+ 948 0018 5D6A     		ldr	r5, [r3, #36]
+ 949 001a 641B     		subs	r4, r4, r5
+ 950 001c 9C60     		str	r4, [r3, #8]
+ 202:Src/bldc.c    ****     ADCSampPare.busVoltage = ADC_DualConvertValTab[3];
+ 951              		.loc 1 202 0
+ 952 001e C088     		ldrh	r0, [r0, #6]
+ 953 0020 5861     		str	r0, [r3, #20]
+ 203:Src/bldc.c    ****     switch (hallTree.hallState)
+ 954              		.loc 1 203 0
+ 955 0022 134B     		ldr	r3, .L67+8
+ 956 0024 DB78     		ldrb	r3, [r3, #3]	@ zero_extendqisi2
+ 957 0026 013B     		subs	r3, r3, #1
+ 958 0028 052B     		cmp	r3, #5
+ 959 002a 07D8     		bhi	.L57
+ 960 002c DFE803F0 		tbb	[pc, r3]
+ 961              	.L60:
+ 962 0030 08       		.byte	(.L59-.L60)/2
+ 963 0031 10       		.byte	(.L61-.L60)/2
+ 964 0032 0C       		.byte	(.L62-.L60)/2
+ 965 0033 18       		.byte	(.L63-.L60)/2
+ARM GAS  C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s 			page 22
+
+
+ 966 0034 03       		.byte	(.L64-.L60)/2
+ 967 0035 14       		.byte	(.L65-.L60)/2
+ 968              		.p2align 1
+ 969              	.L64:
+ 204:Src/bldc.c    ****     {
+ 205:Src/bldc.c    ****     case 0x05:
+ 206:Src/bldc.c    ****     {
+ 207:Src/bldc.c    ****         ADCSampPare.busCurr = ADCSampPare.phaseVCurr + ADCSampPare.phaseWCurr;
+ 970              		.loc 1 207 0
+ 971 0036 2244     		add	r2, r2, r4
+ 972 0038 0C4B     		ldr	r3, .L67+4
+ 973 003a 5A60     		str	r2, [r3, #4]
+ 974              	.L57:
+ 208:Src/bldc.c    ****     }
+ 209:Src/bldc.c    ****     break;
+ 210:Src/bldc.c    ****     case 0x01:
+ 211:Src/bldc.c    ****     {
+ 212:Src/bldc.c    ****         ADCSampPare.busCurr = ADCSampPare.phaseUCurr + ADCSampPare.phaseWCurr;
+ 213:Src/bldc.c    ****     }
+ 214:Src/bldc.c    ****     break;
+ 215:Src/bldc.c    ****     case 0x03:
+ 216:Src/bldc.c    ****     {
+ 217:Src/bldc.c    ****         ADCSampPare.busCurr = ADCSampPare.phaseVCurr + ADCSampPare.phaseWCurr;
+ 218:Src/bldc.c    ****     }
+ 219:Src/bldc.c    ****     break;
+ 220:Src/bldc.c    ****     case 0x02:
+ 221:Src/bldc.c    ****     {
+ 222:Src/bldc.c    ****         ADCSampPare.busCurr = ADCSampPare.phaseUCurr + ADCSampPare.phaseVCurr;
+ 223:Src/bldc.c    ****     }
+ 224:Src/bldc.c    ****     break;
+ 225:Src/bldc.c    ****     case 0x06:
+ 226:Src/bldc.c    ****     {
+ 227:Src/bldc.c    ****         ADCSampPare.busCurr = ADCSampPare.phaseUCurr + ADCSampPare.phaseVCurr;
+ 228:Src/bldc.c    ****     }
+ 229:Src/bldc.c    ****     break;
+ 230:Src/bldc.c    ****     case 0x04:
+ 231:Src/bldc.c    ****     {
+ 232:Src/bldc.c    ****         ADCSampPare.busCurr = ADCSampPare.phaseWCurr + ADCSampPare.phaseVCurr;
+ 233:Src/bldc.c    ****     }
+ 234:Src/bldc.c    ****     break;
+ 235:Src/bldc.c    ****     default:
+ 236:Src/bldc.c    ****     {
+ 237:Src/bldc.c    ****         ADCSampPare.busCurr = ADCSampPare.busCurr;
+ 238:Src/bldc.c    ****     }
+ 239:Src/bldc.c    ****     break;
+ 240:Src/bldc.c    ****     }
+ 241:Src/bldc.c    **** }...
+ 975              		.loc 1 241 0
+ 976 003c 30BC     		pop	{r4, r5}
+ 977              	.LCFI8:
+ 978              		.cfi_remember_state
+ 979              		.cfi_restore 5
+ 980              		.cfi_restore 4
+ 981              		.cfi_def_cfa_offset 0
+ 982 003e 7047     		bx	lr
+ 983              	.L59:
+ 984              	.LCFI9:
+ARM GAS  C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s 			page 23
+
+
+ 985              		.cfi_restore_state
+ 212:Src/bldc.c    ****         ADCSampPare.busCurr = ADCSampPare.phaseUCurr + ADCSampPare.phaseWCurr;
+ 986              		.loc 1 212 0
+ 987 0040 2144     		add	r1, r1, r4
+ 988 0042 0A4B     		ldr	r3, .L67+4
+ 989 0044 5960     		str	r1, [r3, #4]
+ 214:Src/bldc.c    ****     break;
+ 990              		.loc 1 214 0
+ 991 0046 F9E7     		b	.L57
+ 992              	.L62:
+ 217:Src/bldc.c    ****         ADCSampPare.busCurr = ADCSampPare.phaseVCurr + ADCSampPare.phaseWCurr;
+ 993              		.loc 1 217 0
+ 994 0048 2244     		add	r2, r2, r4
+ 995 004a 084B     		ldr	r3, .L67+4
+ 996 004c 5A60     		str	r2, [r3, #4]
+ 219:Src/bldc.c    ****     break;
+ 997              		.loc 1 219 0
+ 998 004e F5E7     		b	.L57
+ 999              	.L61:
+ 222:Src/bldc.c    ****         ADCSampPare.busCurr = ADCSampPare.phaseUCurr + ADCSampPare.phaseVCurr;
+ 1000              		.loc 1 222 0
+ 1001 0050 0A44     		add	r2, r2, r1
+ 1002 0052 064B     		ldr	r3, .L67+4
+ 1003 0054 5A60     		str	r2, [r3, #4]
+ 224:Src/bldc.c    ****     break;
+ 1004              		.loc 1 224 0
+ 1005 0056 F1E7     		b	.L57
+ 1006              	.L65:
+ 227:Src/bldc.c    ****         ADCSampPare.busCurr = ADCSampPare.phaseUCurr + ADCSampPare.phaseVCurr;
+ 1007              		.loc 1 227 0
+ 1008 0058 0A44     		add	r2, r2, r1
+ 1009 005a 044B     		ldr	r3, .L67+4
+ 1010 005c 5A60     		str	r2, [r3, #4]
+ 229:Src/bldc.c    ****     break;
+ 1011              		.loc 1 229 0
+ 1012 005e EDE7     		b	.L57
+ 1013              	.L63:
+ 232:Src/bldc.c    ****         ADCSampPare.busCurr = ADCSampPare.phaseWCurr + ADCSampPare.phaseVCurr;
+ 1014              		.loc 1 232 0
+ 1015 0060 2244     		add	r2, r2, r4
+ 1016 0062 024B     		ldr	r3, .L67+4
+ 1017 0064 5A60     		str	r2, [r3, #4]
+ 1018              		.loc 1 241 0
+ 1019 0066 E9E7     		b	.L57
+ 1020              	.L68:
+ 1021              		.align	2
+ 1022              	.L67:
+ 1023 0068 00000000 		.word	ADC_DualConvertValTab
+ 1024 006c 00000000 		.word	.LANCHOR6
+ 1025 0070 00000000 		.word	hallTree
+ 1026              		.cfi_endproc
+ 1027              	.LFE135:
+ 1029              		.global	ADCSampPare
+ 1030              		.global	piICurr
+ 1031              		.global	piSpd
+ 1032              		.comm	stateContr,32,4
+ 1033              		.comm	hallTree,52,4
+ARM GAS  C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s 			page 24
+
+
+ 1034              		.comm	ADC_DualConvertValTab,10,4
+ 1035              		.section	.bss.ADC_PhaseU_Curr.8211,"aw",%nobits
+ 1036              		.align	2
+ 1037              		.set	.LANCHOR3,. + 0
+ 1040              	ADC_PhaseU_Curr.8211:
+ 1041 0000 00000000 		.space	128
+ 1041      00000000 
+ 1041      00000000 
+ 1041      00000000 
+ 1041      00000000 
+ 1042              		.section	.bss.ADC_PhaseV_Curr.8212,"aw",%nobits
+ 1043              		.align	2
+ 1044              		.set	.LANCHOR4,. + 0
+ 1047              	ADC_PhaseV_Curr.8212:
+ 1048 0000 00000000 		.space	128
+ 1048      00000000 
+ 1048      00000000 
+ 1048      00000000 
+ 1048      00000000 
+ 1049              		.section	.bss.ADC_PhaseW_Curr.8213,"aw",%nobits
+ 1050              		.align	2
+ 1051              		.set	.LANCHOR5,. + 0
+ 1054              	ADC_PhaseW_Curr.8213:
+ 1055 0000 00000000 		.space	128
+ 1055      00000000 
+ 1055      00000000 
+ 1055      00000000 
+ 1055      00000000 
+ 1056              		.section	.bss.oldVal.8188,"aw",%nobits
+ 1057              		.set	.LANCHOR2,. + 0
+ 1060              	oldVal.8188:
+ 1061 0000 00       		.space	1
+ 1062              		.section	.bss.piICurr,"aw",%nobits
+ 1063              		.align	2
+ 1064              		.set	.LANCHOR1,. + 0
+ 1067              	piICurr:
+ 1068 0000 00000000 		.space	72
+ 1068      00000000 
+ 1068      00000000 
+ 1068      00000000 
+ 1068      00000000 
+ 1069              		.section	.bss.piSpd,"aw",%nobits
+ 1070              		.align	2
+ 1071              		.set	.LANCHOR0,. + 0
+ 1074              	piSpd:
+ 1075 0000 00000000 		.space	72
+ 1075      00000000 
+ 1075      00000000 
+ 1075      00000000 
+ 1075      00000000 
+ 1076              		.section	.data.ADCSampPare,"aw",%progbits
+ 1077              		.align	2
+ 1078              		.set	.LANCHOR6,. + 0
+ 1081              	ADCSampPare:
+ 1082 0000 00000000 		.word	0
+ 1083 0004 00000000 		.word	0
+ 1084 0008 00000000 		.word	0
+ARM GAS  C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s 			page 25
+
+
+ 1085 000c 00000000 		.word	0
+ 1086 0010 00000000 		.word	0
+ 1087 0014 00000000 		.word	0
+ 1088 0018 00000000 		.word	0
+ 1089 001c 00000000 		.word	0
+ 1090 0020 00000000 		.word	0
+ 1091 0024 E8030000 		.word	1000
+ 1092 0028 18000000 		.word	24
+ 1093 002c 00000000 		.space	4
+ 1094              		.text
+ 1095              	.Letext0:
+ 1096              		.file 2 "c:\\program files (x86)\\gnu tools arm embedded\\7 2018-q2-update\\arm-none-eabi\\include
+ 1097              		.file 3 "c:\\program files (x86)\\gnu tools arm embedded\\7 2018-q2-update\\arm-none-eabi\\include
+ 1098              		.file 4 "Drivers/CMSIS/Include/core_cm4.h"
+ 1099              		.file 5 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/system_stm32f4xx.h"
+ 1100              		.file 6 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f405xx.h"
+ 1101              		.file 7 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h"
+ 1102              		.file 8 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h"
+ 1103              		.file 9 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h"
+ 1104              		.file 10 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h"
+ 1105              		.file 11 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_adc.h"
+ 1106              		.file 12 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h"
+ 1107              		.file 13 "Inc/tim.h"
+ 1108              		.file 14 "Inc/adc.h"
+ 1109              		.file 15 "Inc/bldc.h"
+ARM GAS  C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s 			page 26
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 bldc.c
+C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s:18     .text.PID_Init:00000000 $t
+C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s:25     .text.PID_Init:00000000 PID_Init
+C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s:81     .text.PID_Init:00000034 $d
+C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s:92     .text.threeHallPara_Init:00000000 $t
+C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s:99     .text.threeHallPara_Init:00000000 threeHallPara_Init
+C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s:118    .text.threeHallPara_Init:00000010 $d
+                            *COM*:00000034 hallTree
+C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s:123    .text.uHALLEdge:00000000 $t
+C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s:130    .text.uHALLEdge:00000000 uHALLEdge
+C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s:164    .text.uHALLEdge:00000018 $d
+C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s:173    .text.hallSwitch:00000000 $t
+C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s:180    .text.hallSwitch:00000000 hallSwitch
+C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s:283    .text.hallSwitch:00000096 $d
+C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s:289    .text.hallSwitch:000000a2 $t
+C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s:567    .text.hallSwitch:000002b8 $d
+                            *COM*:00000020 stateContr
+C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s:583    .text.hallSwitch:000002f0 $t
+C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s:588    .text.hallSwitch:000002fc $d
+C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s:594    .text.hallSwitch:00000302 $t
+C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s:790    .text.hallSwitch:0000047c $d
+C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s:799    .text.offsetCurrentRead:00000000 $t
+C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s:806    .text.offsetCurrentRead:00000000 offsetCurrentRead
+C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s:905    .text.offsetCurrentRead:0000005c $d
+                            *COM*:0000000a ADC_DualConvertValTab
+C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s:915    .text.HALL_ADCSample:00000000 $t
+C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s:922    .text.HALL_ADCSample:00000000 HALL_ADCSample
+C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s:962    .text.HALL_ADCSample:00000030 $d
+C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s:968    .text.HALL_ADCSample:00000036 $t
+C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s:1023   .text.HALL_ADCSample:00000068 $d
+C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s:1081   .data.ADCSampPare:00000000 ADCSampPare
+C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s:1067   .bss.piICurr:00000000 piICurr
+C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s:1074   .bss.piSpd:00000000 piSpd
+C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s:1036   .bss.ADC_PhaseU_Curr.8211:00000000 $d
+C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s:1040   .bss.ADC_PhaseU_Curr.8211:00000000 ADC_PhaseU_Curr.8211
+C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s:1043   .bss.ADC_PhaseV_Curr.8212:00000000 $d
+C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s:1047   .bss.ADC_PhaseV_Curr.8212:00000000 ADC_PhaseV_Curr.8212
+C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s:1050   .bss.ADC_PhaseW_Curr.8213:00000000 $d
+C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s:1054   .bss.ADC_PhaseW_Curr.8213:00000000 ADC_PhaseW_Curr.8213
+C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s:1060   .bss.oldVal.8188:00000000 oldVal.8188
+C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s:1061   .bss.oldVal.8188:00000000 $d
+C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s:1063   .bss.piICurr:00000000 $d
+C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s:1070   .bss.piSpd:00000000 $d
+C:\Users\Cairne\AppData\Local\Temp\ccISCSUR.s:1077   .data.ADCSampPare:00000000 $d
+
+UNDEFINED SYMBOLS
+__aeabi_i2d
+__aeabi_dmul
+__aeabi_dadd
+__aeabi_d2uiz
+HAL_GPIO_ReadPin
+HAL_GPIO_WritePin
+TIM_CCxChannelCmd
+htim1
